@@ -6,7 +6,7 @@ import Data.List as L
 
 -- Prints a list of strings to the console
 printList :: [String] -> IO()
-printList stringlist = P.putStr (concatMap (P.++ "\n")) "" stringlist
+printList stringlist = P.putStr (unlines stringlist)
 
 -- Gets the filename only from a location
 getFileName :: String -> String
