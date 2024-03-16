@@ -26,8 +26,6 @@ executable negative
                        gloss,
                        JuicyPixels,
                        gloss-juicy,
-                       accelerate,
-                       accelerate-io-JuicyPixels,
                        bytestring,
                        vector
   hs-source-dirs:      src
