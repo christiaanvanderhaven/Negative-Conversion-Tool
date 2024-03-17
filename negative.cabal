@@ -22,7 +22,7 @@ executable negative
                        Parse
                        Helper
   -- other-extensions:
-  build-depends:       base >=4.13 && <4.14,
+  build-depends:       base,
                        gloss,
                        JuicyPixels,
                        gloss-juicy,
