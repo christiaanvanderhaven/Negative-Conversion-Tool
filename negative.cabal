@@ -21,6 +21,9 @@ executable negative
   other-modules:       Conversions
                        Parse
                        Helper
+                       Controller
+                       Model
+                       View
   -- other-extensions:
   build-depends:       base,
                        gloss,
