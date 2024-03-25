@@ -38,14 +38,14 @@ convertarg [] = error "Could not match argument list, see -help"
 convertarg [loc] = do 
   negative <- convertFromFile loc
   P.putStr "See UI to pick base...\n" 
-    >> return (ChooseBase 0.25 (0, 0) (imageWidth negative, imageHeight negative) (fromImageRGB8 negative) (0, 0))
+    >> return (ChooseBase 0.25 (0, 0) (imageWidth negative, imageHeight negative) (fromImageRGB8 negative) negative (0, 0) (0, 0))
 
 -- Automatic base selection
 convertarg (loc:["-A"]) = do 
   negative <- convertFromFile loc
   print (findBase negative) >> P.putStr "Finds automatic base colour\n" 
     >> saveConverted (imageConvert negative (findBase negative)) loc
-    >> return (Result (fromImageRGB8 (imageConvert negative (findBase negative))))
+    >> return (Result (fromImageRGB8 (imageConvert negative (findBase negative))) 0.25)
 
 convertarg (loc:"-F":[format]) = P.putStr ("Outputs in: " P.++ format) >> return EmptyState
 convertarg (loc:"-A":"-F":[format]) = P.putStr ("Finds automatic base colour and outputs in" P.++ format) >> return EmptyState

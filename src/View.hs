@@ -11,9 +11,22 @@ viewPure EmptyState = Blank
 viewPure choosebase@(ChooseBase 
   {
     imageScale  = is,
-    screenSize  = ss,
+    screenSize  = (sx, sy),
     pictureSize = ps,
     neg         = n,
+    mouseLoc    = (mx, my),
     loc         = (x, y)
   })
-  = scale is is n
+  = pictures [positionPicture n choosebase, text (show x ++ ", " ++ show y)]
+
+viewPure (Result converted is) = scale is is converted
+
+positionPicture :: Picture -> NCTState -> Picture
+positionPicture pic state@(ChooseBase {
+  imageScale = is, 
+  pictureSize = (px, py),
+  screenSize = (sx, sy)
+}) = translate tx ty (scale is is pic)
+    where
+      tx = (fromIntegral px/2 * is) - fromIntegral sx/2
+      ty = (fromIntegral py/2 * is) - fromIntegral sy/2

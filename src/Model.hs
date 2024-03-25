@@ -1,5 +1,7 @@
 module Model where
 import Graphics.Gloss
+import Codec.Picture
+import Codec.Picture.Types
 
 data NCTState = EmptyState
   | ChooseBase
@@ -8,9 +10,12 @@ data NCTState = EmptyState
     screenSize  :: (Int, Int),
     pictureSize :: (Int, Int),
     neg         :: Picture,
-    loc         :: Point
+    juicyNeg    :: Image PixelRGB8,
+    mouseLoc    :: Point,
+    loc         :: (Int, Int)
   }
   | Result
   {
-    neg         :: Picture
+    neg         :: Picture,
+    imageScale  :: Float
   }

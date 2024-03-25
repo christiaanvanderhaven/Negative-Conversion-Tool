@@ -8,6 +8,10 @@ import Codec.Picture.Types
 imageConvert :: Image PixelRGB8 -> PixelRGB8 -> Image PixelRGB8
 imageConvert image base = pixelMap (pixelConvert base) image
 
+imageConvertLoc :: Image PixelRGB8 -> (Int, Int) -> Image PixelRGB8
+imageConvertLoc image (x, y) = imageConvert image (pixelAt image x y)
+
+
 -- Finds the base of the negative
 -- Currently achieved through finding the brightest pixel in the image
 findBase :: Image PixelRGB8 -> PixelRGB8
@@ -20,9 +24,24 @@ findBase image = pixelFold findBrightest (PixelRGB8 0 0 0) image
     
     brightness (PixelRGB8 red green blue) = fromIntegral red + fromIntegral green + fromIntegral blue
 
+
+-- Given a base sample, tries to find the real base average from the population (the image)
+sampleBase :: Image PixelRGB8 -> PixelRGB8 -> PixelRGB8
+sampleBase image (PixelRGB8 mred mgreen mblue) = pixelFold samplePixel (0, 0, 0, 0) image
+  where
+    samplePixel (PixelRGB8 red green blue) _ _ (r, g, b, accumulated) = (newVal red r mred, newVal green g mgreen, newVal blue b mblue, 0)
+
+    newVal subpixel subpixeltotal subpixelmedian = subpixeltotal + (normalDistribution subpixel subpixelmedian 5.1)
+
+    normalDistribution :: Float -> Float -> Float -> Float
+    normalDistribution x mean sd = (1/(sd * sqrt (2 * pi))) * (exp (((x - mean) / sd)  ** 2) / (-2))
+
+    floatToRGB (r, g, b) = PixelRGB8 round r round g round b
+
 -- Converts a single pixel
 pixelConvert :: PixelRGB8 -> PixelRGB8 -> PixelRGB8
 pixelConvert base pixel = correctGamma 0.6 (correctWhitePoint (removeBase base pixel) base)
+
 
 -- Eliminates the given base
 removeBase :: PixelRGB8 -> PixelRGB8 -> PixelRGB8
@@ -35,12 +54,14 @@ removeBase (PixelRGB8 red green blue) (PixelRGB8 baseRed baseGreen baseBlue) =
       then pixel - base
       else 0
 
+
 -- Applies gamma function to better divide tones across RGB space
 correctGamma :: Float -> PixelRGB8 -> PixelRGB8
 correctGamma y (PixelRGB8 r g b) = PixelRGB8 (correctValue r) (correctValue g) (correctValue b)
   where
     correctValue :: Pixel8 -> Pixel8
     correctValue val = floor  (255.0 * ((fromIntegral val / 255.0) ** y))
+
 
 -- Choose highest basecolour value and multiply to achieve better white point
 -- 'Stretches' the image to fill the full RGB space
