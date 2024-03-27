@@ -38,8 +38,8 @@ sampleBase image (PixelRGB8 r_median g_median b_median) = toResult (pixelFold sa
 
     newVal :: Pixel8 -> Float -> Float -> Pixel8 -> (Float, Float)
     newVal subpixel_sample subpixel_summed_total subpixel_total_weight subpixel_median = (
-        subpixel_summed_total + (fromIntegral subpixel_sample * normalDistribution (fromIntegral subpixel_sample) (fromIntegral subpixel_median) 35), 
-        subpixel_total_weight + normalDistribution (fromIntegral subpixel_sample) (fromIntegral subpixel_median) 35
+        subpixel_summed_total + (fromIntegral subpixel_sample * normalDistribution (fromIntegral subpixel_sample) (fromIntegral subpixel_median) 50), 
+        subpixel_total_weight + normalDistribution (fromIntegral subpixel_sample) (fromIntegral subpixel_median) 50
       )
 
     normalDistribution :: Float -> Float -> Float -> Float
@@ -80,10 +80,10 @@ correctGamma y (PixelRGB8 r g b) = PixelRGB8 (correctValue r) (correctValue g) (
 -- 'Stretches' the image to fill the full RGB space
 correctWhitePoint :: PixelRGB8 -> PixelRGB8 -> PixelRGB8
 correctWhitePoint (PixelRGB8 red green blue) base@(PixelRGB8 baseRed baseGreen baseBlue) = 
-  PixelRGB8 (multiply red) (multiply green) (multiply blue)
+  PixelRGB8 (multiply red baseRed) (multiply green baseGreen) (multiply blue baseBlue)
   where
-    multiply :: Pixel8 -> Pixel8
-    multiply value = floor (fromIntegral value * multiplier)
+    multiply :: Pixel8 -> Pixel8 -> Pixel8
+    multiply value basevalue = floor (fromIntegral value * (255 / fromIntegral basevalue))
 
     highestBase :: Pixel8
     highestBase = P.maximum [baseRed, baseGreen, baseBlue]
