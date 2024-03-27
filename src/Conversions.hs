@@ -9,7 +9,7 @@ imageConvert :: Image PixelRGB8 -> PixelRGB8 -> Image PixelRGB8
 imageConvert image base = pixelMap (pixelConvert base) image
 
 imageConvertLoc :: Image PixelRGB8 -> (Int, Int) -> Image PixelRGB8
-imageConvertLoc image (x, y) = imageConvert image (pixelAt image x y)
+imageConvertLoc image (x, y) = imageConvert image (sampleBase image (pixelAt image x y))
 
 
 -- Finds the base of the negative
@@ -27,16 +27,29 @@ findBase image = pixelFold findBrightest (PixelRGB8 0 0 0) image
 
 -- Given a base sample, tries to find the real base average from the population (the image)
 sampleBase :: Image PixelRGB8 -> PixelRGB8 -> PixelRGB8
-sampleBase image (PixelRGB8 mred mgreen mblue) = pixelFold samplePixel (0, 0, 0, 0) image
+sampleBase image (PixelRGB8 r_median g_median b_median) = toResult (pixelFold samplePixel ((0, 0), (0, 0), (0, 0)) image)
   where
-    samplePixel (PixelRGB8 red green blue) _ _ (r, g, b, accumulated) = (newVal red r mred, newVal green g mgreen, newVal blue b mblue, 0)
+    samplePixel :: ((Float, Float), (Float, Float), (Float, Float)) -> Int -> Int -> PixelRGB8 -> ((Float, Float), (Float, Float), (Float, Float))
+    samplePixel ((r_summed_total, r_total_weight), (g_summed_total, g_total_weight), (b_summed_total, b_total_weight)) _ _ (PixelRGB8 r_sample g_sample b_sample) = ( 
+        newVal r_sample r_summed_total r_total_weight r_median, 
+        newVal g_sample g_summed_total g_total_weight g_median, 
+        newVal b_sample b_summed_total b_total_weight b_median 
+      )
 
-    newVal subpixel subpixeltotal subpixelmedian = subpixeltotal + (normalDistribution subpixel subpixelmedian 5.1)
+    newVal :: Pixel8 -> Float -> Float -> Pixel8 -> (Float, Float)
+    newVal subpixel_sample subpixel_summed_total subpixel_total_weight subpixel_median = (
+        subpixel_summed_total + (fromIntegral subpixel_sample * normalDistribution (fromIntegral subpixel_sample) (fromIntegral subpixel_median) 35), 
+        subpixel_total_weight + normalDistribution (fromIntegral subpixel_sample) (fromIntegral subpixel_median) 35
+      )
 
     normalDistribution :: Float -> Float -> Float -> Float
-    normalDistribution x mean sd = (1/(sd * sqrt (2 * pi))) * (exp (((x - mean) / sd)  ** 2) / (-2))
+    normalDistribution x mean sd = (1/(sd * sqrt (2 * pi))) * exp ((((x - mean) / sd)  ** 2) * (-0.5))
 
-    floatToRGB (r, g, b) = PixelRGB8 round r round g round b
+    toResult ((r_summed_total, r_total_weight), (g_summed_total, g_total_weight), (b_summed_total, b_total_weight)) = 
+      PixelRGB8
+        (round (r_summed_total / r_total_weight)) 
+        (round (g_summed_total / g_total_weight)) 
+        (round (b_summed_total / b_total_weight))
 
 -- Converts a single pixel
 pixelConvert :: PixelRGB8 -> PixelRGB8 -> PixelRGB8
