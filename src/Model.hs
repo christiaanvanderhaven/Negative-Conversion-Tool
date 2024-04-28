@@ -17,5 +17,6 @@ data NCTState = EmptyState
   | Result
   {
     neg         :: Picture,
-    imageScale  :: Float
+    imageScale  :: Float,
+    screenSize  :: (Int, Int)
   }

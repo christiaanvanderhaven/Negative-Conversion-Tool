@@ -45,7 +45,14 @@ convertarg (loc:["-A"]) = do
   negative <- convertFromFile loc
   print (findBase negative) >> P.putStr "Finds automatic base colour\n" 
     >> saveConverted (imageConvert negative (findBase negative)) loc
-    >> return (Result (fromImageRGB8 (imageConvert negative (findBase negative))) 0.25)
+    >> return (Result (fromImageRGB8 (imageConvert negative (findBase negative))) 0.25 (0, 0))
+
+convertarg (loc:["-RAW"]) = do
+  (negative16, dynamicImage) <- convertFromFile16 loc
+  case fromDynamicImage dynamicImage of
+    Nothing -> error "Could not convert from dynamicimage"
+    Just dynamicPicture -> return (Result dynamicPicture 0.25 (0, 0))
+  
 
 convertarg (loc:"-F":[format]) = P.putStr ("Outputs in: " P.++ format) >> return EmptyState
 convertarg (loc:"-A":"-F":[format]) = P.putStr ("Finds automatic base colour and outputs in" P.++ format) >> return EmptyState
@@ -58,6 +65,13 @@ convertFromFile location = do
   case dimage of
     Left err-> error "Image could not be read"
     Right dynamicImage -> return (convertRGB8 dynamicImage)
+
+convertFromFile16 :: String -> IO (Image PixelRGB16, DynamicImage)
+convertFromFile16 location = do
+  dimage <- readImage location
+  case dimage of
+    Left err -> error "Image could not be read"
+    Right dynamicImage -> return (convertRGB16 dynamicImage, dynamicImage)
 
 -- Saves to a file
 saveConverted :: Image PixelRGB8 -> String -> IO ()
