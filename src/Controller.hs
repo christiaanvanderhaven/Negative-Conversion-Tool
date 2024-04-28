@@ -27,7 +27,7 @@ inputKey (EventKey (Char '-') Down _ _) state@(ChooseBase { imageScale = s }) = 
 inputKey (EventKey (Char '=') Down _ _) state@(Result { imageScale = s }) = return state {imageScale = s * 2}
 inputKey (EventKey (Char '-') Down _ _) state@(Result { imageScale = s }) = return state {imageScale = s / 2}
 
-inputKey (EventKey (SpecialKey KeyEnter) Down _ _) state@(ChooseBase { loc = l, juicyNeg = jn }) = return (Result (fromImageRGB8 (imageConvertLoc jn l)) 0.25 (0, 0))
+inputKey (EventKey (SpecialKey KeyEnter) Down _ _) state@(ChooseBase { loc = l, juicyNeg = jn }) = return (Result (fromImageRGB8 (toImageRGB8 (imageConvertLoc jn l))) 0.25 (0, 0))
 
 inputKey (EventKey (MouseButton LeftButton) Down _ _) state@(ChooseBase { mouseLoc = m }) = 
   return state {loc = screenToPixel m state}

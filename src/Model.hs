@@ -10,7 +10,7 @@ data NCTState = EmptyState
     screenSize  :: (Int, Int),
     pictureSize :: (Int, Int),
     neg         :: Picture,
-    juicyNeg    :: Image PixelRGB8,
+    juicyNeg    :: Image PixelRGB16,
     mouseLoc    :: Point,
     loc         :: (Int, Int)
   }

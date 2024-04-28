@@ -18,6 +18,7 @@ extra-source-files:  CHANGELOG.md
 
 executable negative
   main-is:             Main.hs
+  ghc-options:         -threaded
   other-modules:       Conversions
                        Parse
                        Helper
