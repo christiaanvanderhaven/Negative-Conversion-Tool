@@ -85,6 +85,9 @@ removeBase (PixelRGB8 red green blue) (PixelRGB8 baseRed baseGreen baseBlue) =
 correctGamma :: Float -> PixelRGB8 -> PixelRGB8
 correctGamma y (PixelRGB8 r g b) = PixelRGB8 (correctValue r) (correctValue g) (correctValue b)
   where
+    average_intensity :: Pixel8
+    average_intensity = div (r + g + b) 3
+
     correctValue :: Pixel8 -> Pixel8
     correctValue val = floor  (255.0 * ((fromIntegral val / 255.0) ** y))
 
