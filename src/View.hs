@@ -19,7 +19,7 @@ viewPure choosebase@(ChooseBase
   })
   = pictures [positionPicture n choosebase, text (show x ++ ", " ++ show y)]
 
-viewPure (Result converted is) = scale is is converted
+viewPure (Result converted is _) = scale is is converted
 
 positionPicture :: Picture -> NCTState -> Picture
 positionPicture pic state@(ChooseBase {

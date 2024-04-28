@@ -43,9 +43,9 @@ convertarg [loc] = do
 -- Automatic base selection
 convertarg (loc:["-A"]) = do 
   negative <- convertFromFile loc
-  print (findBase negative) >> P.putStr "Finds automatic base colour\n" 
+  print (sampleBase negative) >> P.putStr "Finds automatic base colour\n" 
     >> saveConverted (imageConvert negative (findBase negative)) loc
-    >> return (Result (fromImageRGB8 (imageConvert negative (findBase negative))) 0.25)
+    >> return (Result (fromImageRGB8 (imageConvert negative (sampleBase negative))) 0.25 (0, 0))
 
 convertarg (loc:"-F":[format]) = P.putStr ("Outputs in: " P.++ format) >> return EmptyState
 convertarg (loc:"-A":"-F":[format]) = P.putStr ("Finds automatic base colour and outputs in" P.++ format) >> return EmptyState
