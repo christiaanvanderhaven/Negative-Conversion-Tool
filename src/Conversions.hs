@@ -92,7 +92,7 @@ correctGamma y (PixelRGB16 r g b) = PixelRGB16 (correctValue r) (correctValue g)
     average_intensity = div (r + g + b) 3
 
     correctValue :: Pixel16 -> Pixel16
-    correctValue val = floor  (255.0 * ((fromIntegral val / 255.0) ** y))
+    correctValue val = floor  (65535.0 * ((fromIntegral val / 65535.0) ** y))
 
 
 -- Choose highest basecolour value and multiply to achieve better white point
@@ -102,10 +102,10 @@ correctWhitePoint (PixelRGB16 red green blue) base@(PixelRGB16 baseRed baseGreen
   PixelRGB16 (multiply red baseRed) (multiply green baseGreen) (multiply blue baseBlue)
   where
     multiply :: Pixel16 -> Pixel16 -> Pixel16
-    multiply value basevalue = floor (fromIntegral value * (255 / fromIntegral basevalue))
+    multiply value basevalue = floor (fromIntegral value * (65535 / fromIntegral basevalue))
 
     highestBase :: Pixel16
     highestBase = P.maximum [baseRed, baseGreen, baseBlue]
 
     multiplier :: Float
-    multiplier = 255 / fromIntegral highestBase
+    multiplier = 65535 / fromIntegral highestBase
